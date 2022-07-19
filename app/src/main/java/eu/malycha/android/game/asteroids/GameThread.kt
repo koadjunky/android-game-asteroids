@@ -20,6 +20,7 @@ class GameThread(private val surfaceHolder: SurfaceHolder, private val gameView:
     private fun tick() {
         val canvas = lockCanvas()
         synchronized(surfaceHolder) {
+            this.gameView.update()
             this.gameView.draw(canvas!!)
         }
         unlockCanvas(canvas)
