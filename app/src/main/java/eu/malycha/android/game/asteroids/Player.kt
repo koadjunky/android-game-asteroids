@@ -11,8 +11,15 @@ class Player(var image: Bitmap) {
 
     var x: Int = 0
     var y: Int = 0
+    private val w: Int = image.width
+    private val h: Int = image.height
     private val screenWidth = Resources.getSystem().displayMetrics.widthPixels
     private val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+
+    private val corner_x: Float
+        get() = (x - w/2).toFloat()
+    private val corner_y: Float
+        get() = (y - h/2).toFloat()
 
     var crosshair: Crosshair? = null
     private val paint: Paint
@@ -26,7 +33,7 @@ class Player(var image: Bitmap) {
     }
 
     fun draw(canvas: Canvas) {
-        canvas.drawBitmap(image, x.toFloat(), y.toFloat(), null)
+        canvas.drawBitmap(image, corner_x, corner_y, null)
         if (crosshair!!.visible) {
             canvas.drawLine(
                 x.toFloat(),
