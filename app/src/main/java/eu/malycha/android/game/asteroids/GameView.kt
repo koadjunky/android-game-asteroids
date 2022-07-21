@@ -49,6 +49,7 @@ class GameView(context: Context, attributes: AttributeSet): SurfaceView(context,
     }
 
     fun update() {
+        player!!.update()
         if (touched) {
             crosshair!!.updateTouch(touched_x, touched_y)
         }
