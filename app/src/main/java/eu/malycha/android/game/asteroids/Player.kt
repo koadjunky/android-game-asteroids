@@ -3,12 +3,13 @@ package eu.malycha.android.game.asteroids
 import android.content.res.Resources
 import android.graphics.*
 import android.util.Log
+import java.lang.Math.*
 
 class Player(var image: Bitmap) {
 
     var x: Int = 0
     var y: Int = 0
-    var angle: Float = 10.0f
+    var angle: Double = 0.0
     private val w: Int = image.width
     private val h: Int = image.height
     private val screenWidth = Resources.getSystem().displayMetrics.widthPixels
@@ -30,13 +31,28 @@ class Player(var image: Bitmap) {
         paint.strokeWidth = 1f
     }
 
-    fun update() {
-        angle += 1.0f
+    fun crosshair_angle(): Double {
+        val dx = (crosshair!!.x - x).toDouble()
+        val dy = (y - crosshair!!.y).toDouble()
+        val angle = atan2(dx, dy)
+        return toDegrees(angle)
     }
 
-    fun Bitmap.rotate(degrees: Float): Bitmap {
+    fun update() {
+        if (crosshair!!.visible) {
+            var angleDelta = crosshair_angle() - angle
+            if (angleDelta > 180.0) {
+                angleDelta -= 360.0
+            } else if (angleDelta < -180.0) {
+                angleDelta += 360.0
+            }
+            angle += angleDelta.coerceIn(-1.0, 1.0)
+        }
+    }
+
+    fun Bitmap.rotate(degrees: Double): Bitmap {
         val matrix = Matrix().apply {
-            postRotate(degrees, 0.0f, 0.0f)
+            postRotate(degrees.toFloat(), 0.0f, 0.0f)
         }
         return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
     }
