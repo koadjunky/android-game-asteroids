@@ -9,6 +9,8 @@ class Player(var image: Bitmap) {
 
     var x: Int = 0
     var y: Int = 0
+    var vx: Int = 2
+    var vy: Int = 3
     var angle: Double = 0.0
     private val w: Int = image.width
     private val h: Int = image.height
@@ -39,6 +41,8 @@ class Player(var image: Bitmap) {
     }
 
     fun update() {
+        x = (x + vx).mod(screenWidth)
+        y = (y + vy).mod(screenHeight)
         if (crosshair!!.visible) {
             var angleDelta = crosshair_angle() - angle
             if (angleDelta > 180.0) {
