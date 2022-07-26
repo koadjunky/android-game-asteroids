@@ -2,25 +2,24 @@ package eu.malycha.android.game.asteroids
 
 import android.content.res.Resources
 import android.graphics.*
-import android.util.Log
 import java.lang.Math.*
 
 class Player(var image: Bitmap) {
 
+    val max_acc: Double = 0.2
+
     var x: Int = 0
     var y: Int = 0
-    var vx: Int = 2
-    var vy: Int = 3
+    var vx: Double = 2.0
+    var vy: Double = 3.0
     var angle: Double = 0.0
     private val w: Int = image.width
     private val h: Int = image.height
     private val screenWidth = Resources.getSystem().displayMetrics.widthPixels
     private val screenHeight = Resources.getSystem().displayMetrics.heightPixels
 
-    private val corner_x: Float
-        get() = (x - w/2).toFloat()
-    private val corner_y: Float
-        get() = (y - h/2).toFloat()
+    private val speed: Double
+        get() = hypot(vx, vy)
 
     var crosshair: Crosshair? = null
     private val paint: Paint
@@ -33,24 +32,42 @@ class Player(var image: Bitmap) {
         paint.strokeWidth = 1f
     }
 
-    fun crosshair_angle(): Double {
+    private fun crosshairAngle(): Double {
         val dx = (crosshair!!.x - x).toDouble()
         val dy = (y - crosshair!!.y).toDouble()
         val angle = atan2(dx, dy)
         return toDegrees(angle)
     }
 
+    private fun crosshairDistance(): Double {
+        val dx = (crosshair!!.x - x).toDouble()
+        val dy = (y - crosshair!!.y).toDouble()
+        return hypot(dx, dy)
+    }
+
+    private fun acceleration(): Double {
+        if (!crosshair!!.visible) return 0.0
+        val t = speed / max_acc
+        val s = 0.5 * max_acc * t * t
+        val d = crosshairDistance()
+        return if (s < d) max_acc else -max_acc
+    }
+
     fun update() {
-        x = (x + vx).mod(screenWidth)
-        y = (y + vy).mod(screenHeight)
+        val a = acceleration()
+        vx += a * sin(toRadians(angle))
+        vy += -a * cos(toRadians(angle))
+        // TODO: Recalculate everything to Double, apply toInt() as last step
+        x = (x + vx).toInt().mod(screenWidth)
+        y = (y + vy).toInt().mod(screenHeight)
         if (crosshair!!.visible) {
-            var angleDelta = crosshair_angle() - angle
+            var angleDelta = crosshairAngle() - angle
             if (angleDelta > 180.0) {
                 angleDelta -= 360.0
             } else if (angleDelta < -180.0) {
                 angleDelta += 360.0
             }
-            angle += angleDelta.coerceIn(-1.0, 1.0)
+            angle += angleDelta.coerceIn(-2.0, 2.0)
         }
     }
 
