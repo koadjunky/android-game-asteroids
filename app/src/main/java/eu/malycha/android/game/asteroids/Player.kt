@@ -3,13 +3,14 @@ package eu.malycha.android.game.asteroids
 import android.content.res.Resources
 import android.graphics.*
 import java.lang.Math.*
+import kotlin.math.sign
 
 class Player(var image: Bitmap) {
 
     val max_acc: Double = 0.2
 
-    var x: Int = 0
-    var y: Int = 0
+    var x: Double = 0.0
+    var y: Double = 0.0
     var vx: Double = 2.0
     var vy: Double = 3.0
     var angle: Double = 0.0
@@ -25,8 +26,8 @@ class Player(var image: Bitmap) {
     private val paint: Paint
 
     init {
-        x = screenWidth / 2
-        y = screenHeight / 2
+        x = screenWidth / 2.0
+        y = screenHeight / 2.0
         paint = Paint()
         paint.color = Color.WHITE
         paint.strokeWidth = 1f
@@ -39,9 +40,20 @@ class Player(var image: Bitmap) {
         return toDegrees(angle)
     }
 
+    private fun angleDelta(angle1: Double, angle2: Double): Double {
+        val delta = angle2 - angle1
+        return if (delta > 180.0) {
+            delta - 360.0
+        } else if (delta <= -180.0) {
+            delta + 360.0
+        } else {
+            delta
+        }
+    }
+
     private fun crosshairDistance(): Double {
-        val dx = (crosshair!!.x - x).toDouble()
-        val dy = (y - crosshair!!.y).toDouble()
+        val dx = crosshair!!.x - x
+        val dy = y - crosshair!!.y
         return hypot(dx, dy)
     }
 
@@ -53,22 +65,43 @@ class Player(var image: Bitmap) {
         return if (s < d) max_acc else -max_acc
     }
 
-    fun update() {
-        val a = acceleration()
-        vx += a * sin(toRadians(angle))
-        vy += -a * cos(toRadians(angle))
-        // TODO: Recalculate everything to Double, apply toInt() as last step
-        x = (x + vx).toInt().mod(screenWidth)
-        y = (y + vy).toInt().mod(screenHeight)
+    private fun updateAngle() {
         if (crosshair!!.visible) {
-            var angleDelta = crosshairAngle() - angle
-            if (angleDelta > 180.0) {
-                angleDelta -= 360.0
-            } else if (angleDelta < -180.0) {
-                angleDelta += 360.0
-            }
-            angle += angleDelta.coerceIn(-2.0, 2.0)
+            val delta = angleDelta(angle, crosshairAngle())
+            angle += delta.coerceIn(-2.0, 2.0)
         }
+    }
+
+    private fun updateSpeed() {
+        if (crosshair!!.visible) {
+            val delta = abs(angleDelta(angle, crosshairAngle()))
+            if (delta < 45.0) {
+                val a = acceleration()
+                vx += a * sin(toRadians(angle))
+                vy += -a * cos(toRadians(angle))
+            }
+        } else {
+            vx -= sign(vx) * min(abs(vx), max_acc)
+            vy -= sign(vy) * min(abs(vy), max_acc)
+        }
+    }
+
+    private fun updatePosition() {
+        x += vx
+        while (x < 0) x += screenWidth
+        while (x > screenWidth) x -= screenWidth
+        y += vy
+        while (y < 0) y += screenHeight
+        while (y > screenHeight) y -= screenHeight
+        if (crosshairDistance() < 10) {
+            crosshair!!.visible = false
+        }
+    }
+
+    fun update() {
+        updateAngle()
+        updateSpeed()
+        updatePosition()
     }
 
     fun Bitmap.rotate(degrees: Double): Bitmap {
