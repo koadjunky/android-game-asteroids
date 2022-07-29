@@ -34,8 +34,8 @@ class Player(var image: Bitmap) {
     }
 
     private fun crosshairAngle(): Double {
-        val dx = (crosshair!!.x - x).toDouble()
-        val dy = (y - crosshair!!.y).toDouble()
+        val dx = crosshair!!.x - x
+        val dy = y - crosshair!!.y
         val angle = atan2(dx, dy)
         return toDegrees(angle)
     }
@@ -59,31 +59,44 @@ class Player(var image: Bitmap) {
 
     private fun acceleration(): Double {
         if (!crosshair!!.visible) return 0.0
-        val t = speed / max_acc
-        val s = 0.5 * max_acc * t * t
-        val d = crosshairDistance()
-        return if (s < d) max_acc else -max_acc
+        val delta = angleDelta(angle, crosshairAngle())
+        if (abs(delta) < 90.0) {
+            return max_acc
+        } else {
+            return -max_acc
+        }
     }
 
     private fun updateAngle() {
+        val maxRSpeed = 2.0
         if (crosshair!!.visible) {
             val delta = angleDelta(angle, crosshairAngle())
-            angle += delta.coerceIn(-2.0, 2.0)
+            if (delta < -90) {
+                angle += (180.0+delta).coerceIn(-maxRSpeed, maxRSpeed)
+            } else if (delta > 90) {
+                angle += (-180.0-delta).coerceIn(-maxRSpeed, maxRSpeed)
+            } else {
+                angle += delta.coerceIn(-2.0, 2.0)
+            }
         }
     }
 
     private fun updateSpeed() {
         if (crosshair!!.visible) {
-            val delta = abs(angleDelta(angle, crosshairAngle()))
-            if (delta < 45.0) {
-                val a = acceleration()
-                vx += a * sin(toRadians(angle))
-                vy += -a * cos(toRadians(angle))
+            var a = acceleration()
+            a = if (a < 0) {
+                max(a, -speed)
+            } else {
+                a
             }
+            vx += a * sin(toRadians(angle))
+            vy += -a * cos(toRadians(angle))
         } else {
             vx -= sign(vx) * min(abs(vx), max_acc)
             vy -= sign(vy) * min(abs(vy), max_acc)
         }
+        vx = vx.coerceIn(-5.0 * max_acc, 5.0 * max_acc)
+        vy = vy.coerceIn(-5.0 * max_acc, 5.0 * max_acc)
     }
 
     private fun updatePosition() {
