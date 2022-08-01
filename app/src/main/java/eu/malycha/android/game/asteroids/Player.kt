@@ -60,10 +60,10 @@ class Player(var image: Bitmap) {
     private fun acceleration(): Double {
         if (!crosshair!!.visible) return 0.0
         val delta = angleDelta(angle, crosshairAngle())
-        if (abs(delta) < 90.0) {
-            return max_acc
+        return if (abs(delta) < 90.0) {
+            max_acc
         } else {
-            return -max_acc
+            -max_acc
         }
     }
 
