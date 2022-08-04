@@ -42,4 +42,20 @@ class Vector2dTest {
         assertEquals(Vector2d(-3.0, 2.0), +Vector2d(-3.0, 2.0))
         assertEquals(Vector2d(-3.0, -2.0), +Vector2d(-3.0, -2.0))
     }
+
+    @Test
+    fun plus_is_correct() {
+        assertEquals(Vector2d(5.0, 6.0), Vector2d(3.0, 2.0) + Vector2d(2.0, 4.0))
+        assertEquals(Vector2d(-1.0, 2.0), Vector2d(-3.0, -2.0) + Vector2d(2.0, 4.0))
+        assertEquals(Vector2d(-5.0, -6.0), Vector2d(-3.0, -2.0) + Vector2d(-2.0, -4.0))
+        assertEquals(Vector2d(1.0, -2.0), Vector2d(3.0, 2.0) + Vector2d(-2.0, -4.0))
+    }
+
+    @Test
+    fun minus_is_correct() {
+        assertEquals(Vector2d(1.0, -2.0), Vector2d(3.0, 2.0) - Vector2d(2.0, 4.0))
+        assertEquals(Vector2d(-5.0, -6.0), Vector2d(-3.0, -2.0) - Vector2d(2.0, 4.0))
+        assertEquals(Vector2d(-1.0, 2.0), Vector2d(-3.0, -2.0) - Vector2d(-2.0, -4.0))
+        assertEquals(Vector2d(5.0, 6.0), Vector2d(3.0, 2.0) - Vector2d(-2.0, -4.0))
+    }
 }
