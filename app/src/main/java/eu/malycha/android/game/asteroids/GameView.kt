@@ -3,7 +3,10 @@ package eu.malycha.android.game.asteroids
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.PixelFormat
+import android.graphics.PorterDuff
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -20,7 +23,9 @@ class GameView(context: Context, attributes: AttributeSet): SurfaceView(context,
     private var touched_y: Int = 0
 
     init {
+        setZOrderOnTop(true)
         holder.addCallback(this)
+        holder.setFormat(PixelFormat.TRANSPARENT)
         thread = GameThread(holder, this)
     }
 
@@ -57,7 +62,7 @@ class GameView(context: Context, attributes: AttributeSet): SurfaceView(context,
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
-
+        canvas.drawColor(0, PorterDuff.Mode.CLEAR)
         player!!.draw(canvas)
         crosshair!!.draw(canvas)
     }
@@ -73,6 +78,9 @@ class GameView(context: Context, attributes: AttributeSet): SurfaceView(context,
             MotionEvent.ACTION_UP -> touched = false
             MotionEvent.ACTION_CANCEL -> touched = false
             MotionEvent.ACTION_OUTSIDE -> touched = false
+        }
+        if (touched) {
+            Log.i("GameView", "Touched x:${touched_x}, y:${touched_y}")
         }
         return true
     }
