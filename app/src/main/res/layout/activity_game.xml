@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/stars"
-            android:contentDescription="Starry night" />
+            android:contentDescription="@string/background_description" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,10 +33,32 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center|bottom"
         android:orientation="horizontal" >
 
         <!-- Buttons go there -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:text="L"
+            style="?android:attr/buttonBarButtonStyle" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:text="D"
+            style="?android:attr/buttonBarButtonStyle" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:text="R"
+            style="?android:attr/buttonBarButtonStyle" />
 
     </LinearLayout>
 </RelativeLayout>
